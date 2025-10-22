@@ -1,0 +1,59 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Iniciar Sesión - TechStore Pro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0 text-center"><i class="fas fa-store me-2"></i>TechStore Pro</h2>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <h4 class="card-title text-center mb-4">Iniciar Sesión</h4>
+
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Tu usuario o contraseña son incorrectos.
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">
+                            <i class="fas fa-user me-2"></i>Usuario
+                        </label>
+                        <input type="text" name="username" class="form-control form-control-lg" id="id_username" required autofocus>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label">
+                            <i class="fas fa-key me-2"></i>Contraseña
+                        </label>
+                        <input type="password" name="password" class="form-control form-control-lg" id="id_password" required>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                        </button>
+                    </div>
+                    
+                    <input type="hidden" name="next" value="{{ next }}">
+                </form>
+
+                <hr>
+                <div class="text-center">
+                    <small>¿No tienes una cuenta? 
+                        <a href="{% url 'registrar' %}">Regístrate aquí</a>
+                    </small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

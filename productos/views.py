@@ -1,11 +1,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+# --- INICIO DE CÓDIGO AÑADIDO ---
+from django.contrib.auth.decorators import login_required # Para proteger vistas
+from django.contrib.auth import login # Para iniciar sesión al registrarse
+# --- FIN DE CÓDIGO AÑADIDO ---
 from django.core.paginator import Paginator
 from django.db.models import Q
 from decouple import config
 from .models import Producto, Categoria
-from .forms import ProductoForm
+# --- Importamos el nuevo formulario de registro ---
+from .forms import ProductoForm, CategoriaForm, RegistroForm
 
+@login_required # <-- AÑADIDO: Proteger esta vista
 def lista_productos(request):
     productos_list = Producto.objects.filter(activo=True).select_related('categoria')
     
@@ -71,10 +77,12 @@ def lista_productos(request):
     
     return render(request, 'productos/lista.html', context)
 
+@login_required # <-- AÑADIDO: Proteger esta vista
 def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     return render(request, 'productos/detalle.html', {'producto': producto})
 
+@login_required # <-- AÑADIDO: Proteger esta vista
 def crear_producto(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST)
@@ -87,6 +95,7 @@ def crear_producto(request):
     
     return render(request, 'productos/crear.html', {'form': form})
 
+@login_required # <-- AÑADIDO: Proteger esta vista
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     
@@ -101,6 +110,7 @@ def editar_producto(request, pk):
     
     return render(request, 'productos/editar.html', {'form': form, 'producto': producto})
 
+@login_required # <-- AÑADIDO: Proteger esta vista
 def eliminar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     
@@ -112,11 +122,14 @@ def eliminar_producto(request, pk):
         return redirect('lista_productos')
     
     return render(request, 'productos/eliminar.html', {'producto': producto})
+
 # Vistas para gestión de categorías
+@login_required # <-- AÑADIDO: Proteger esta vista
 def lista_categorias(request):
     categorias = Categoria.objects.filter(activo=True).order_by('nombre')
     return render(request, 'productos/categorias/lista.html', {'categorias': categorias})
 
+@login_required # <-- AÑADIDO: Proteger esta vista
 def crear_categoria(request):
     from .forms import CategoriaForm
     if request.method == 'POST':
@@ -130,6 +143,7 @@ def crear_categoria(request):
     
     return render(request, 'productos/categorias/crear.html', {'form': form})
 
+@login_required # <-- AÑADIDO: Proteger esta vista
 def editar_categoria(request, pk):
     from .forms import CategoriaForm
     categoria = get_object_or_404(Categoria, pk=pk)
@@ -144,22 +158,17 @@ def editar_categoria(request, pk):
         form = CategoriaForm(instance=categoria)
     
     return render(request, 'productos/categorias/editar.html', {'form': form, 'categoria': categoria})
+
 # Vistas para área de usuario y configuraciones
+@login_required # <-- AÑADIDO: Proteger esta vista
 def mi_perfil(request):
     """Vista para mostrar y editar el perfil del usuario"""
-    context = {
-        'usuario': {
-            'nombre': 'Administrador',
-            'email': 'admin@techstore.com',
-            'rol': 'Administrador del Sistema',
-            'fecha_registro': '2024-01-15',
-            'ultimo_acceso': '2024-10-21 14:30',
-            'productos_creados': 13,
-            'categorias_creadas': 8
-        }
-    }
-    return render(request, 'productos/usuario/perfil.html', context)
+    # --- MODIFICADO ---
+    # Ya no se necesita el contexto falso. El objeto 'user'
+    # (request.user) está disponible automáticamente en la plantilla.
+    return render(request, 'productos/usuario/perfil.html')
 
+@login_required # <-- AÑADIDO: Proteger esta vista
 def configuracion(request):
     """Vista para configuraciones del sistema"""
     if request.method == 'POST':
@@ -184,7 +193,30 @@ def configuracion(request):
     }
     return render(request, 'productos/usuario/configuracion.html', context)
 
-def cerrar_sesion(request):
-    """Vista para cerrar sesión"""
-    messages.info(request, 'Sesión cerrada exitosamente.')
-    return redirect('lista_productos')
+# --- ELIMINADO ---
+# La función 'cerrar_sesion' se elimina porque Django la manejará
+# automáticamente a través de la URL de 'logout'.
+
+
+# --- INICIO DE CÓDIGO NUEVO AÑADIDO ---
+
+def registrar_usuario(request):
+    """Vista para registrar un nuevo usuario"""
+    if request.user.is_authenticated:
+        # Si el usuario ya está logueado, lo mandamos al inicio
+        return redirect('lista_productos')
+
+    if request.method == 'POST':
+        form = RegistroForm(request.POST)
+        if form.is_valid():
+            user = form.save() # Guarda el nuevo usuario en la base de datos
+            login(request, user) # Inicia sesión automáticamente
+            messages.success(request, f"¡Bienvenido, {user.username}! Tu cuenta ha sido creada.")
+            return redirect('lista_productos')
+    else:
+        form = RegistroForm()
+    
+    # Muestra la plantilla con el formulario (vacío o con errores)
+    return render(request, 'productos/registrar.html', {'form': form})
+
+# --- FIN DE CÓDIGO NUEVO AÑADIDO ---

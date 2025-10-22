@@ -123,3 +123,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# --- INICIO DE CÓDIGO NUEVO AÑADIDO ---
+
+# --- Redirecciones de Login ---
+# URL a la que se redirige a los usuarios si no están logueados
+LOGIN_URL = 'login'
+
+# URL a la que se redirige después de un login exitoso
+LOGIN_REDIRECT_URL = 'lista_productos'
+
+# URL a la que se redirige después de un logout exitoso
+LOGOUT_REDIRECT_URL = 'login'
+
+# --- FIN DE CÓDIGO NUEVO AÑADIDO ---

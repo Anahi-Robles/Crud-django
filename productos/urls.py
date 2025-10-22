@@ -1,4 +1,6 @@
 from django.urls import path
+# Importa las vistas de autenticación de Django
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
@@ -14,8 +16,23 @@ urlpatterns = [
     path('categorias/crear/', views.crear_categoria, name='crear_categoria'),
     path('categorias/<int:pk>/editar/', views.editar_categoria, name='editar_categoria'),
     
-    # Usuario y Configuraciones
+    # --- Autenticación ---
+    
+    # Login
+    path('login/', auth_views.LoginView.as_view(
+        template_name='productos/login.html',
+        redirect_authenticated_user=True 
+    ), name='login'),
+    
+    # Registro
+    path('registrar/', views.registrar_usuario, name='registrar'),
+    
+    # Logout
+    path('logout/', auth_views.LogoutView.as_view(
+        next_page='login'
+    ), name='logout'),
+
+    # Vistas de Usuario
     path('mi-perfil/', views.mi_perfil, name='mi_perfil'),
     path('configuracion/', views.configuracion, name='configuracion'),
-    path('cerrar-sesion/', views.cerrar_sesion, name='cerrar_sesion'),
 ]

@@ -1,5 +1,44 @@
 from django import forms
+# Importa el formulario de creación de usuarios
+from django.contrib.auth.forms import UserCreationForm
+# Importa el modelo User
+from django.contrib.auth.models import User
 from .models import Producto, Categoria
+
+# --- Ahora empieza tu clase ---
+class RegistroForm(UserCreationForm):
+    # ...
+    # Añadimos el campo de email, que no viene por defecto
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'correo@ejemplo.com'
+        }),
+        help_text="Requerido. Escribe un email válido."
+    )
+
+    class Meta:
+        model = User
+        # Definimos los campos que queremos en el formulario
+        fields = ('username', 'email')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Añadimos las clases de Bootstrap a los campos que ya existen
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Elige un nombre de usuario'
+        })
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Escribe una contraseña'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Repite la contraseña'
+        })
+
 
 class ProductoForm(forms.ModelForm):
     class Meta:
