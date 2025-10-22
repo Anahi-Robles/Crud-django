@@ -1,0 +1,388 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Configuración del Sistema - TechStore Pro{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'lista_productos' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li class="breadcrumb-item active">Configuración</li>
+    </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="mb-0"><i class="fas fa-cogs me-3"></i>Configuración del Sistema</h1>
+            <p class="text-muted mt-2">Personaliza la aplicación según tus necesidades</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <button class="btn btn-outline-secondary" onclick="resetearConfiguracion()">
+                <i class="fas fa-undo me-2"></i>Restablecer Valores por Defecto
+            </button>
+        </div>
+    </div>
+</div>
+
+<form method="post" id="configForm">
+    {% csrf_token %}
+    <div class="row">
+        <!-- General Settings -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-building me-2"></i>Configuración General</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="empresa_nombre" class="form-label">
+                            <i class="fas fa-store me-2"></i>Nombre de la Empresa
+                        </label>
+                        <input type="text" class="form-control" id="empresa_nombre" name="empresa_nombre" 
+                               value="{{ configuraciones.empresa_nombre }}" placeholder="TechStore Pro">
+                        <div class="form-text">Este nombre aparecerá en la navegación y reportes</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="items_por_pagina" class="form-label">
+                            <i class="fas fa-list me-2"></i>Elementos por Página
+                        </label>
+                        <select class="form-select" id="items_por_pagina" name="items_por_pagina">
+                            <option value="6" {% if configuraciones.items_por_pagina == 6 %}selected{% endif %}>6 elementos</option>
+                            <option value="12" {% if configuraciones.items_por_pagina == 12 %}selected{% endif %}>12 elementos</option>
+                            <option value="24" {% if configuraciones.items_por_pagina == 24 %}selected{% endif %}>24 elementos</option>
+                            <option value="48" {% if configuraciones.items_por_pagina == 48 %}selected{% endif %}>48 elementos</option>
+                        </select>
+                        <div class="form-text">Número de productos mostrados por página</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="moneda" class="form-label">
+                            <i class="fas fa-dollar-sign me-2"></i>Moneda
+                        </label>
+                        <select class="form-select" id="moneda" name="moneda">
+                            <option value="USD" {% if configuraciones.moneda == 'USD' %}selected{% endif %}>USD - Dólar Estadounidense</option>
+                            <option value="MXN" {% if configuraciones.moneda == 'MXN' %}selected{% endif %}>MXN - Peso Mexicano</option>
+                            <option value="EUR" {% if configuraciones.moneda == 'EUR' %}selected{% endif %}>EUR - Euro</option>
+                            <option value="COP" {% if configuraciones.moneda == 'COP' %}selected{% endif %}>COP - Peso Colombiano</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="idioma" class="form-label">
+                            <i class="fas fa-language me-2"></i>Idioma
+                        </label>
+                        <select class="form-select" id="idioma" name="idioma">
+                            <option value="es" {% if configuraciones.idioma == 'es' %}selected{% endif %}>Español</option>
+                            <option value="en" {% if configuraciones.idioma == 'en' %}selected{% endif %}>English</option>
+                            <option value="fr" {% if configuraciones.idioma == 'fr' %}selected{% endif %}>Français</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interface Settings -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-palette me-2"></i>Configuración de Interfaz</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="tema" class="form-label">
+                            <i class="fas fa-moon me-2"></i>Tema de la Aplicación
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="tema" id="tema_light" value="light" 
+                                       {% if configuraciones.tema == 'light' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary w-100" for="tema_light">
+                                    <i class="fas fa-sun"></i><br>Claro
+                                </label>
+                            </div>
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="tema" id="tema_dark" value="dark"
+                                       {% if configuraciones.tema == 'dark' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary w-100" for="tema_dark">
+                                    <i class="fas fa-moon"></i><br>Oscuro
+                                </label>
+                            </div>
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="tema" id="tema_auto" value="auto"
+                                       {% if configuraciones.tema == 'auto' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary w-100" for="tema_auto">
+                                    <i class="fas fa-adjust"></i><br>Auto
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="zona_horaria" class="form-label">
+                            <i class="fas fa-clock me-2"></i>Zona Horaria
+                        </label>
+                        <select class="form-select" id="zona_horaria" name="zona_horaria">
+                            <option value="America/Mexico_City" {% if configuraciones.zona_horaria == 'America/Mexico_City' %}selected{% endif %}>México (GMT-6)</option>
+                            <option value="America/New_York" {% if configuraciones.zona_horaria == 'America/New_York' %}selected{% endif %}>Nueva York (GMT-5)</option>
+                            <option value="America/Los_Angeles" {% if configuraciones.zona_horaria == 'America/Los_Angeles' %}selected{% endif %}>Los Ángeles (GMT-8)</option>
+                            <option value="Europe/Madrid" {% if configuraciones.zona_horaria == 'Europe/Madrid' %}selected{% endif %}>Madrid (GMT+1)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="notificaciones" name="notificaciones" 
+                                   {% if configuraciones.notificaciones %}checked{% endif %}>
+                            <label class="form-check-label" for="notificaciones">
+                                <i class="fas fa-bell me-2"></i>Activar Notificaciones
+                            </label>
+                        </div>
+                        <div class="form-text">Recibir alertas de stock bajo y actualizaciones</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="animaciones" name="animaciones" checked>
+                            <label class="form-check-label" for="animaciones">
+                                <i class="fas fa-magic me-2"></i>Activar Animaciones
+                            </label>
+                        </div>
+                        <div class="form-text">Efectos visuales y transiciones suaves</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="sonidos" name="sonidos">
+                            <label class="form-check-label" for="sonidos">
+                                <i class="fas fa-volume-up me-2"></i>Sonidos de Interfaz
+                            </label>
+                        </div>
+                        <div class="form-text">Sonidos para acciones y notificaciones</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Inventory Settings -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-warehouse me-2"></i>Configuración de Inventario</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="stock_minimo_global" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Stock Mínimo Global
+                            </label>
+                            <input type="number" class="form-control" id="stock_minimo_global" 
+                                   name="stock_minimo_global" value="5" min="0">
+                            <div class="form-text">Valor por defecto para nuevos productos</div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="alerta_stock" class="form-label">
+                                <i class="fas fa-bell me-2"></i>Días para Alerta de Stock
+                            </label>
+                            <input type="number" class="form-control" id="alerta_stock" 
+                                   name="alerta_stock" value="7" min="1">
+                            <div class="form-text">Días antes de que se agote el stock</div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="backup_automatico" class="form-label">
+                                <i class="fas fa-save me-2"></i>Backup Automático
+                            </label>
+                            <select class="form-select" id="backup_automatico" name="backup_automatico">
+                                <option value="diario">Diario</option>
+                                <option value="semanal" selected>Semanal</option>
+                                <option value="mensual">Mensual</option>
+                                <option value="nunca">Nunca</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Los cambios se aplicarán inmediatamente al guardar
+                            </small>
+                        </div>
+                        <div>
+                            <a href="{% url 'lista_productos' %}" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save me-2"></i>Guardar Configuración
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Preview Changes -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-eye me-2"></i>Vista Previa de Cambios</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Consejo:</strong> Puedes ver una vista previa de los cambios antes de guardarlos.
+                    Los cambios de tema se aplicarán inmediatamente para que puedas evaluarlos.
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check-circle text-success me-2"></i>Configuración Actual:</h6>
+                        <ul class="list-unstyled small">
+                            <li><strong>Empresa:</strong> {{ configuraciones.empresa_nombre }}</li>
+                            <li><strong>Elementos por página:</strong> {{ configuraciones.items_por_pagina }}</li>
+                            <li><strong>Tema:</strong> {{ configuraciones.tema|title }}</li>
+                            <li><strong>Notificaciones:</strong> {% if configuraciones.notificaciones %}Activadas{% else %}Desactivadas{% endif %}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-cog text-primary me-2"></i>Acciones Disponibles:</h6>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="exportarConfiguracion()">
+                                <i class="fas fa-download me-2"></i>Exportar Configuración
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="importarConfiguracion()">
+                                <i class="fas fa-upload me-2"></i>Importar Configuración
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Aplicar tema en tiempo real
+    document.querySelectorAll('input[name="tema"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const tema = this.value;
+            document.documentElement.setAttribute('data-bs-theme', tema === 'auto' ? 'light' : tema);
+        });
+    });
+    
+    // Validación del formulario
+    document.getElementById('configForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Simular guardado
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>
+            Configuración guardada exitosamente.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const container = document.querySelector('.container.main-content');
+        container.insertBefore(alertDiv, container.firstChild);
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Auto-hide alert
+        setTimeout(() => {
+            const alert = new bootstrap.Alert(alertDiv);
+            alert.close();
+        }, 3000);
+    });
+    
+    function resetearConfiguracion() {
+        if (confirm('¿Estás seguro de que deseas restablecer todas las configuraciones a sus valores por defecto?')) {
+            // Restablecer valores
+            document.getElementById('empresa_nombre').value = 'TechStore Pro';
+            document.getElementById('items_por_pagina').value = '12';
+            document.getElementById('tema_light').checked = true;
+            document.getElementById('notificaciones').checked = true;
+            document.getElementById('animaciones').checked = true;
+            document.getElementById('sonidos').checked = false;
+            
+            // Aplicar tema
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+            
+            alert('Configuración restablecida a valores por defecto.');
+        }
+    }
+    
+    function exportarConfiguracion() {
+        const config = {
+            empresa_nombre: document.getElementById('empresa_nombre').value,
+            items_por_pagina: document.getElementById('items_por_pagina').value,
+            tema: document.querySelector('input[name="tema"]:checked').value,
+            notificaciones: document.getElementById('notificaciones').checked,
+            animaciones: document.getElementById('animaciones').checked,
+            sonidos: document.getElementById('sonidos').checked
+        };
+        
+        const dataStr = JSON.stringify(config, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = 'techstore-config.json';
+        link.click();
+    }
+    
+    function importarConfiguracion() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const config = JSON.parse(e.target.result);
+                        
+                        // Aplicar configuración
+                        if (config.empresa_nombre) document.getElementById('empresa_nombre').value = config.empresa_nombre;
+                        if (config.items_por_pagina) document.getElementById('items_por_pagina').value = config.items_por_pagina;
+                        if (config.tema) document.getElementById('tema_' + config.tema).checked = true;
+                        if (config.notificaciones !== undefined) document.getElementById('notificaciones').checked = config.notificaciones;
+                        if (config.animaciones !== undefined) document.getElementById('animaciones').checked = config.animaciones;
+                        if (config.sonidos !== undefined) document.getElementById('sonidos').checked = config.sonidos;
+                        
+                        alert('Configuración importada exitosamente.');
+                    } catch (error) {
+                        alert('Error al importar la configuración. Verifica que el archivo sea válido.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+        
+        input.click();
+    }
+</script>
+{% endblock %}

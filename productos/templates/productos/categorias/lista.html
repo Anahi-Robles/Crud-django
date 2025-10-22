@@ -1,0 +1,190 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Gestión de Categorías - TechStore Pro{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="mb-0"><i class="fas fa-tags me-3"></i>Gestión de Categorías</h1>
+            <p class="text-muted mt-2">Organiza tus productos por categorías</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="{% url 'crear_categoria' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Nueva Categoría
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card stats-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <h6 class="mb-0">Total Categorías</h6>
+                    <h3 class="mb-0">{{ categorias|length }}</h3>
+                </div>
+                <div class="ms-3">
+                    <i class="fas fa-tags fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">Categorías Activas</h6>
+                        <h3 class="mb-0">{{ categorias|length }}</h3>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white;">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">Productos Totales</h6>
+                        <h3 class="mb-0">{{ total_productos|default:0 }}</h3>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-box fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Grid -->
+{% if categorias %}
+    <div class="row">
+        {% for categoria in categorias %}
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                <div class="card h-100 fade-in">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-tag me-2 text-primary"></i>
+                                {{ categoria.nombre }}
+                            </h5>
+                            <span class="badge bg-success">Activa</span>
+                        </div>
+                        
+                        <p class="card-text text-muted">
+                            {{ categoria.descripcion|default:"Sin descripción disponible" }}
+                        </p>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <small class="text-muted d-block">Productos</small>
+                                    <strong class="text-primary">{{ categoria.producto_set.count }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <small class="text-muted d-block">Creada</small>
+                                    <strong class="text-secondary">{{ categoria.fecha_creacion|date:"d/m/Y" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <div class="d-grid gap-2">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'lista_productos' %}?categoria={{ categoria.id }}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Ver Productos
+                                </a>
+                                <a href="{% url 'editar_categoria' categoria.pk %}" 
+                                   class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Editar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <div class="card">
+            <div class="card-body py-5">
+                <i class="fas fa-tags fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">No hay categorías creadas</h4>
+                <p class="text-muted mb-4">
+                    Crea tu primera categoría para organizar mejor tus productos.
+                </p>
+                <a href="{% url 'crear_categoria' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Crear Primera Categoría
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <a href="{% url 'crear_categoria' %}" class="btn btn-success w-100">
+                            <i class="fas fa-plus me-2"></i>Nueva Categoría
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'crear_producto' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-box me-2"></i>Nuevo Producto
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'lista_productos' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-th-large me-2"></i>Ver Dashboard
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'lista_productos' %}?categoria=" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-filter me-2"></i>Ver Todos los Productos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add fade-in animation to cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}

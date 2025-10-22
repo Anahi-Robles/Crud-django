@@ -1,0 +1,337 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Mi Perfil - TechStore Pro{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'lista_productos' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li class="breadcrumb-item active">Mi Perfil</li>
+    </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="mb-0"><i class="fas fa-user-circle me-3"></i>Mi Perfil</h1>
+            <p class="text-muted mt-2">Gestiona tu información personal y estadísticas</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                <i class="fas fa-edit me-2"></i>Editar Perfil
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Profile Information -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
+                         style="width: 120px; height: 120px;">
+                        <i class="fas fa-user fa-4x text-white"></i>
+                    </div>
+                </div>
+                
+                <h4 class="mb-1">{{ usuario.nombre }}</h4>
+                <p class="text-muted mb-3">{{ usuario.rol }}</p>
+                
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="bg-light rounded p-2">
+                            <h5 class="mb-0 text-primary">{{ usuario.productos_creados }}</h5>
+                            <small class="text-muted">Productos</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-light rounded p-2">
+                            <h5 class="mb-0 text-success">{{ usuario.categorias_creadas }}</h5>
+                            <small class="text-muted">Categorías</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                        <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Details -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información Personal</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Nombre Completo</label>
+                        <div class="form-control-plaintext border rounded p-2 bg-light">
+                            <i class="fas fa-user me-2 text-primary"></i>{{ usuario.nombre }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Correo Electrónico</label>
+                        <div class="form-control-plaintext border rounded p-2 bg-light">
+                            <i class="fas fa-envelope me-2 text-primary"></i>{{ usuario.email }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Rol en el Sistema</label>
+                        <div class="form-control-plaintext border rounded p-2 bg-light">
+                            <i class="fas fa-shield-alt me-2 text-primary"></i>{{ usuario.rol }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Fecha de Registro</label>
+                        <div class="form-control-plaintext border rounded p-2 bg-light">
+                            <i class="fas fa-calendar me-2 text-primary"></i>{{ usuario.fecha_registro }}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted">Último Acceso</label>
+                        <div class="form-control-plaintext border rounded p-2 bg-light">
+                            <i class="fas fa-clock me-2 text-primary"></i>{{ usuario.ultimo_acceso }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Stats -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Estadísticas de Actividad</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-primary bg-opacity-10 rounded">
+                            <i class="fas fa-box fa-2x text-primary mb-2"></i>
+                            <h4 class="mb-0">{{ usuario.productos_creados }}</h4>
+                            <small class="text-muted">Productos Creados</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-success bg-opacity-10 rounded">
+                            <i class="fas fa-tags fa-2x text-success mb-2"></i>
+                            <h4 class="mb-0">{{ usuario.categorias_creadas }}</h4>
+                            <small class="text-muted">Categorías Creadas</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-warning bg-opacity-10 rounded">
+                            <i class="fas fa-edit fa-2x text-warning mb-2"></i>
+                            <h4 class="mb-0">47</h4>
+                            <small class="text-muted">Ediciones Realizadas</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-info bg-opacity-10 rounded">
+                            <i class="fas fa-eye fa-2x text-info mb-2"></i>
+                            <h4 class="mb-0">156</h4>
+                            <small class="text-muted">Productos Visualizados</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <a href="{% url 'crear_producto' %}" class="btn btn-success w-100">
+                            <i class="fas fa-plus me-2"></i>Nuevo Producto
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'crear_categoria' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-tag me-2"></i>Nueva Categoría
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'configuracion' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-cog me-2"></i>Configuración
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'lista_productos' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-th-large me-2"></i>Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">
+                    <i class="fas fa-edit me-2"></i>Editar Perfil
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <div class="mb-3">
+                        <label for="editNombre" class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" id="editNombre" value="{{ usuario.nombre }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="editEmail" value="{{ usuario.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTelefono" class="form-label">Teléfono (Opcional)</label>
+                        <input type="tel" class="form-control" id="editTelefono" placeholder="+52 123 456 7890">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarPerfil()">
+                    <i class="fas fa-save me-2"></i>Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">
+                    <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Contraseña Actual</label>
+                        <input type="password" class="form-control" id="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" onclick="cambiarPassword()">
+                    <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function guardarPerfil() {
+        // Simular guardado de perfil
+        const nombre = document.getElementById('editNombre').value;
+        const email = document.getElementById('editEmail').value;
+        
+        if (nombre && email) {
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+            modal.hide();
+            
+            // Mostrar mensaje de éxito
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                Perfil actualizado exitosamente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const container = document.querySelector('.container.main-content');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            // Auto-hide alert
+            setTimeout(() => {
+                const alert = new bootstrap.Alert(alertDiv);
+                alert.close();
+            }, 3000);
+        }
+    }
+    
+    function cambiarPassword() {
+        const current = document.getElementById('currentPassword').value;
+        const newPass = document.getElementById('newPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+        
+        if (!current || !newPass || !confirm) {
+            alert('Por favor, completa todos los campos.');
+            return;
+        }
+        
+        if (newPass !== confirm) {
+            alert('Las contraseñas no coinciden.');
+            return;
+        }
+        
+        if (newPass.length < 6) {
+            alert('La nueva contraseña debe tener al menos 6 caracteres.');
+            return;
+        }
+        
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+        modal.hide();
+        
+        // Mostrar mensaje de éxito
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>
+            Contraseña cambiada exitosamente.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const container = document.querySelector('.container.main-content');
+        container.insertBefore(alertDiv, container.firstChild);
+        
+        // Limpiar formulario
+        document.getElementById('changePasswordForm').reset();
+        
+        // Auto-hide alert
+        setTimeout(() => {
+            const alert = new bootstrap.Alert(alertDiv);
+            alert.close();
+        }, 3000);
+    }
+</script>
+{% endblock %}
