@@ -6,9 +6,14 @@
 <div class="row justify-content-center mt-5">
     <div class="col-md-6 col-lg-5">
         <div class="card shadow-lg">
-            <div class="card-header bg-success text-white">
-                <h2 class="mb-0 text-center"><i class="fas fa-user-plus me-2"></i>Crear Cuenta</h2>
+            <!-- Encabezado azul degradado -->
+            <div class="card-header text-white" 
+                 style="background: linear-gradient(90deg, #0d6efd, #007bff);">
+                <h2 class="mb-0 text-center">
+                    <i class="fas fa-user-plus me-2"></i>Crear Cuenta
+                </h2>
             </div>
+
             <div class="card-body p-4 p-md-5">
                 
                 {% if form.errors %}
@@ -23,29 +28,45 @@
                     <div class="mb-3">
                         <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
                         {{ form.username }}
-                        {% if form.username.help_text %}<div class="form-text">{{ form.username.help_text|safe }}</div>{% endif %}
-                        {% for error in form.username.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        {% if form.username.help_text %}
+                            <div class="form-text">{{ form.username.help_text|safe }}</div>
+                        {% endif %}
+                        {% for error in form.username.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
                     </div>
 
                     <div class="mb-3">
                         <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
                         {{ form.email }}
-                        {% if form.email.help_text %}<div class="form-text">{{ form.email.help_text|safe }}</div>{% endif %}
-                        {% for error in form.email.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        {% if form.email.help_text %}
+                            <div class="form-text">{{ form.email.help_text|safe }}</div>
+                        {% endif %}
+                        {% for error in form.email.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
                     </div>
 
                     <div class="mb-3">
                         <label for="{{ form.password1.id_for_label }}" class="form-label">Contraseña</label>
                         {{ form.password1 }}
-                        {% if form.password1.help_text %}<div class="form-text">{{ form.password1.help_text|safe }}</div>{% endif %}
-                        {% for error in form.password1.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        {% if form.password1.help_text %}
+                            <div class="form-text">{{ form.password1.help_text|safe }}</div>
+                        {% endif %}
+                        {% for error in form.password1.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
                     </div>
 
                     <div class="mb-3">
                         <label for="{{ form.password2.id_for_label }}" class="form-label">Confirmación de contraseña</label>
                         {{ form.password2 }}
-                        {% if form.password2.help_text %}<div class="form-text">{{ form.password2.help_text|safe }}</div>{% endif %}
-                        {% for error in form.password2.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        {% if form.password2.help_text %}
+                            <div class="form-text">{{ form.password2.help_text|safe }}</div>
+                        {% endif %}
+                        {% for error in form.password2.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
                     </div>
                     
                     {% for error in form.non_field_errors %}
@@ -53,7 +74,7 @@
                     {% endfor %}
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-success btn-lg">
+                        <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-user-plus me-2"></i>Registrarme
                         </button>
                     </div>
