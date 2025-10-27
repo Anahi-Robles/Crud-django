@@ -296,6 +296,16 @@
                     
                     {% if user.is_authenticated %}
                     <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'ver_carrito' %}">
+                            <i class="fas fa-shopping-cart me-2"></i>Carrito
+                            {% if carrito_total_items > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge" style="font-size: 0.7em;">
+                                {{ carrito_total_items }}
+                            </span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'crear_producto' %}">
                             <i class="fas fa-plus me-2"></i>Nuevo Producto
                         </a>

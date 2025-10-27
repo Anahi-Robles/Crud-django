@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.core.validators import MinValueValidator
+from django.contrib.auth.models import User
 from decimal import Decimal
 
 class Categoria(models.Model):
@@ -85,3 +86,71 @@ class Producto(models.Model):
 
     def tiene_imagen(self):
         return bool(self.imagen)
+
+
+class Carrito(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Usuario")
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
+
+    class Meta:
+        verbose_name = "Carrito"
+        verbose_name_plural = "Carritos"
+
+    def __str__(self):
+        return f"Carrito de {self.usuario.username}"
+
+    @property
+    def total_items(self):
+        return sum(item.cantidad for item in self.items.all())
+
+    @property
+    def total_precio(self):
+        return sum(item.subtotal for item in self.items.all())
+
+    def agregar_producto(self, producto, cantidad=1):
+        item, created = CarritoItem.objects.get_or_create(
+            carrito=self,
+            producto=producto,
+            defaults={'cantidad': cantidad}
+        )
+        if not created:
+            item.cantidad += cantidad
+            item.save()
+        return item
+
+    def remover_producto(self, producto):
+        try:
+            item = self.items.get(producto=producto)
+            item.delete()
+        except CarritoItem.DoesNotExist:
+            pass
+
+    def limpiar(self):
+        self.items.all().delete()
+
+
+class CarritoItem(models.Model):
+    carrito = models.ForeignKey(Carrito, on_delete=models.CASCADE, related_name='items', verbose_name="Carrito")
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name="Producto")
+    cantidad = models.PositiveIntegerField(default=1, verbose_name="Cantidad", validators=[MinValueValidator(1)])
+    fecha_agregado = models.DateTimeField(auto_now_add=True, verbose_name="Fecha agregado")
+
+    class Meta:
+        verbose_name = "Item del Carrito"
+        verbose_name_plural = "Items del Carrito"
+        unique_together = ('carrito', 'producto')
+
+    def __str__(self):
+        return f"{self.cantidad} x {self.producto.nombre}"
+
+    @property
+    def subtotal(self):
+        return self.cantidad * self.producto.precio
+
+    def actualizar_cantidad(self, nueva_cantidad):
+        if nueva_cantidad <= 0:
+            self.delete()
+        else:
+            self.cantidad = nueva_cantidad
+            self.save()

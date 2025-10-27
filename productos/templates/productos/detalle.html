@@ -41,7 +41,7 @@
                 </div>
                 
                 <!-- Quick Stats -->
-                <div class="row g-2">
+                <div class="row g-2 mb-3">
                     <div class="col-6">
                         <div class="bg-light rounded p-3">
                             <h4 class="text-primary mb-0">${{ producto.precio }}</h4>
@@ -55,6 +55,32 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Add to Cart Section -->
+                {% if producto.stock > 0 %}
+                <div class="border rounded p-3 bg-light">
+                    <form method="post" action="{% url 'agregar_al_carrito' producto.id %}" id="add-to-cart-form">
+                        {% csrf_token %}
+                        <div class="row align-items-end">
+                            <div class="col-6">
+                                <label for="cantidad" class="form-label">Cantidad:</label>
+                                <input type="number" class="form-control" id="cantidad" name="cantidad" 
+                                       value="1" min="1" max="{{ producto.stock }}" required>
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-cart-plus me-2"></i>Agregar al Carrito
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Producto agotado - No disponible para compra
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -232,6 +258,76 @@
                 card.style.transform = 'translateY(0)';
             }, index * 100);
         });
+
+        // Handle add to cart form
+        const addToCartForm = document.getElementById('add-to-cart-form');
+        if (addToCartForm) {
+            addToCartForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                // Show loading state
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Agregando...';
+                submitBtn.disabled = true;
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update cart badge
+                        const cartBadge = document.querySelector('.cart-badge');
+                        if (cartBadge) {
+                            cartBadge.textContent = data.total_items;
+                        }
+                        
+                        // Show success message
+                        showAlert('success', data.message);
+                        
+                        // Reset form
+                        document.getElementById('cantidad').value = 1;
+                    } else {
+                        showAlert('danger', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('danger', 'Error al agregar el producto al carrito');
+                })
+                .finally(() => {
+                    // Restore button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+        }
     });
+
+    function showAlert(type, message) {
+        const alertContainer = document.querySelector('.container.main-content');
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        alertContainer.insertBefore(alert, alertContainer.firstChild);
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    }
 </script>
 {% endblock %}

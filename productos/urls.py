@@ -35,4 +35,12 @@ urlpatterns = [
     # Vistas de Usuario
     path('mi-perfil/', views.mi_perfil, name='mi_perfil'),
     path('configuracion/', views.configuracion, name='configuracion'),
+    
+    # Carrito de Compras
+    path('carrito/', views.ver_carrito, name='ver_carrito'),
+    path('carrito/agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
+    path('carrito/actualizar/<int:item_id>/', views.actualizar_carrito, name='actualizar_carrito'),
+    path('carrito/remover/<int:item_id>/', views.remover_del_carrito, name='remover_del_carrito'),
+    path('carrito/limpiar/', views.limpiar_carrito, name='limpiar_carrito'),
+    path('checkout/', views.procesar_compra, name='procesar_compra'),
 ]
