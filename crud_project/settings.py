@@ -1,5 +1,12 @@
 # --- CONFIGURACIÓN DINÁMICA (PC vs AWS) ---
 
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+DEBUG = False
+
+
 if DEBUG:
     # 1. Configuración para tu PC (Desarrollo)
     DATABASES = {
