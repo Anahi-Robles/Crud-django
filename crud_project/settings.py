@@ -6,6 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = False
 
+ALLOWED_HOSTS = ['*']
 
 if DEBUG:
     # 1. Configuración para tu PC (Desarrollo)
