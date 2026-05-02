@@ -4,6 +4,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = 'django-insecure-m#x*h5z&k!9p2@q6w$v^b3n8m1k0j9h8g7f6d5s4a3'
+
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
