@@ -36,7 +36,7 @@ else:
     }
 
     # Configuración de almacenamiento S3
-    AWS_STORAGE_BUCKET_NAME = 'django-crud-asstes' # Revisa si es 'assets'
+    AWS_STORAGE_BUCKET_NAME = 'django-crud-assets' # Revisa si es 'assets'
     AWS_S3_REGION_NAME = 'us-east-2'
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     
