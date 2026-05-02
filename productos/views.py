@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 # --- INICIO DE CÓDIGO AÑADIDO ---
-from django.contrib.auth.decorators import login_required # Para proteger vistas
+from django.contrib.auth.decorators import login_required, user_passes_test # Para proteger vistas
 from django.contrib.auth import login # Para iniciar sesión al registrarse
 # --- FIN DE CÓDIGO AÑADIDO ---
 from django.core.paginator import Paginator
@@ -12,6 +12,10 @@ from .models import Producto, Categoria, Carrito, CarritoItem
 from .forms import ProductoForm, CategoriaForm, RegistroForm
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+
+# Función auxiliar para verificar si el usuario es superusuario
+def es_superusuario(user):
+    return user.is_superuser
 
 @login_required # <-- AÑADIDO: Proteger esta vista
 def lista_productos(request):
@@ -84,10 +88,11 @@ def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     return render(request, 'productos/detalle.html', {'producto': producto})
 
-@login_required # <-- AÑADIDO: Proteger esta vista
+@login_required
+@user_passes_test(es_superusuario, login_url='lista_productos')
 def crear_producto(request):
     if request.method == 'POST':
-        form = ProductoForm(request.POST)
+        form = ProductoForm(request.POST, request.FILES)  # Agregamos request.FILES para manejar archivos
         if form.is_valid():
             producto = form.save()
             messages.success(request, f'Producto "{producto.nombre}" creado exitosamente.')
@@ -97,12 +102,13 @@ def crear_producto(request):
     
     return render(request, 'productos/crear.html', {'form': form})
 
-@login_required # <-- AÑADIDO: Proteger esta vista
+@login_required
+@user_passes_test(es_superusuario, login_url='lista_productos')
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     
     if request.method == 'POST':
-        form = ProductoForm(request.POST, instance=producto)
+        form = ProductoForm(request.POST, request.FILES, instance=producto)  # Agregamos request.FILES
         if form.is_valid():
             producto = form.save()
             messages.success(request, f'Producto "{producto.nombre}" actualizado exitosamente.')
@@ -112,7 +118,8 @@ def editar_producto(request, pk):
     
     return render(request, 'productos/editar.html', {'form': form, 'producto': producto})
 
-@login_required # <-- AÑADIDO: Proteger esta vista
+@login_required
+@user_passes_test(es_superusuario, login_url='lista_productos')
 def eliminar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     
@@ -131,7 +138,8 @@ def lista_categorias(request):
     categorias = Categoria.objects.filter(activo=True).order_by('nombre')
     return render(request, 'productos/categorias/lista.html', {'categorias': categorias})
 
-@login_required # <-- AÑADIDO: Proteger esta vista
+@login_required
+@user_passes_test(es_superusuario, login_url='lista_productos')
 def crear_categoria(request):
     from .forms import CategoriaForm
     if request.method == 'POST':
@@ -145,7 +153,8 @@ def crear_categoria(request):
     
     return render(request, 'productos/categorias/crear.html', {'form': form})
 
-@login_required # <-- AÑADIDO: Proteger esta vista
+@login_required
+@user_passes_test(es_superusuario, login_url='lista_productos')
 def editar_categoria(request, pk):
     from .forms import CategoriaForm
     categoria = get_object_or_404(Categoria, pk=pk)

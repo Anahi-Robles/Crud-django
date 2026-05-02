@@ -36,7 +36,7 @@
                 <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Información del Producto</h5>
             </div>
             <div class="card-body">
-                <form method="post" id="productForm">
+                <form method="post" enctype="multipart/form-data" id="productForm">
                     {% csrf_token %}
                     
                     <!-- Basic Information -->
@@ -235,7 +235,7 @@
             <div class="card-body">
                 <div class="card">
                     {% if producto.imagen %}
-                        <img src="{{ producto.imagen }}" class="card-img-top" style="height: 200px; object-fit: cover;" 
+                        <img src="{{ producto.imagen.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" 
                              alt="{{ producto.nombre }}"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="card-img-top bg-light d-none align-items-center justify-content-center" style="height: 200px;">

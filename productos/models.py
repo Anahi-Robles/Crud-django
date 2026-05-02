@@ -36,7 +36,7 @@ class Producto(models.Model):
     )
     stock = models.IntegerField(verbose_name="Stock", validators=[MinValueValidator(0)])
     stock_minimo = models.IntegerField(default=5, verbose_name="Stock Mínimo", validators=[MinValueValidator(0)])
-    imagen = models.URLField(blank=True, null=True, verbose_name="URL de Imagen")
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True, verbose_name="Imagen del Producto")
     codigo_barras = models.CharField(max_length=50, blank=True, null=True, verbose_name="Código de Barras", unique=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación", db_index=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")

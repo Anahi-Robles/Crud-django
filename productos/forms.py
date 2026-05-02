@@ -73,9 +73,9 @@ class ProductoForm(forms.ModelForm):
                 'min': '0',
                 'placeholder': '5'
             }),
-            'imagen': forms.URLInput(attrs={
+            'imagen': forms.FileInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'https://ejemplo.com/imagen.jpg'
+                'accept': 'image/*'
             }),
             'codigo_barras': forms.TextInput(attrs={
                 'class': 'form-control',

@@ -305,15 +305,20 @@
                             {% endif %}
                         </a>
                     </li>
+                    {% if user.is_superuser %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'crear_producto' %}">
                             <i class="fas fa-plus me-2"></i>Nuevo Producto
                         </a>
                     </li>
+                    {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle me-2"></i>
                             {{ user.username }}
+                            {% if user.is_superuser %}
+                            <span class="badge bg-warning ms-1" style="font-size: 0.6em;">Admin</span>
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'mi_perfil' %}"><i class="fas fa-user me-2"></i>Mi

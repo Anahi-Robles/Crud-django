@@ -18,7 +18,7 @@
         <div class="card h-100">
             <div class="card-body text-center">
                 {% if producto.imagen %}
-                    <img src="{{ producto.imagen }}" class="img-fluid rounded mb-3" 
+                    <img src="{{ producto.imagen.url }}" class="img-fluid rounded mb-3" 
                          style="max-height: 400px; width: 100%; object-fit: cover;"
                          alt="{{ producto.nombre }}"
                          onerror="this.src='https://via.placeholder.com/400x400/e2e8f0/64748b?text=Sin+Imagen'">
@@ -167,11 +167,12 @@
 </div>
 
 <!-- Action Buttons -->
+{% if user.is_superuser %}
 <div class="row mt-4">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Acciones Disponibles</h5>
+                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Acciones de Administrador</h5>
             </div>
             <div class="card-body">
                 <div class="row g-2">
@@ -200,6 +201,15 @@
         </div>
     </div>
 </div>
+{% else %}
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'lista_productos' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Catálogo
+        </a>
+    </div>
+</div>
+{% endif %}
 
 <!-- Stock Alert -->
 {% if producto.estado_stock == 'bajo_stock' %}
@@ -215,6 +225,7 @@
 {% endif %}
 
 <!-- Delete Confirmation Modal -->
+{% if user.is_superuser %}
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -242,6 +253,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
