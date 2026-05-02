@@ -100,3 +100,10 @@ LOGIN_REDIRECT_URL = 'lista_productos'
 LOGOUT_REDIRECT_URL = 'login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATIC_URL = '/static/'
+
+# Si estamos en AWS (Production), sobreescribimos la ruta para que apunte a S3
+if not DEBUG:
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
