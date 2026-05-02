@@ -8,6 +8,17 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles', 
+    'storages',                    
+    'productos',           
+]
+
 if DEBUG:
     # 1. Configuración para tu PC (Desarrollo)
     DATABASES = {
