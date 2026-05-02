@@ -14,11 +14,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles', 
-    'storages',                    
-    'productos',           
+    'django.contrib.staticfiles',
+    'storages',    # Para S3
+    'productos',   # Tu app
 ]
 
+# 2. El "pegamento" de Django (Esto es lo que faltaba)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -29,6 +30,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+ROOT_URLCONF = 'crud_project.urls'
+
+# 3. Configuración de HTML/Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -45,6 +49,7 @@ TEMPLATES = [
     },
 ]
 
+WSGI_APPLICATION = 'crud_project.wsgi.application'
 if DEBUG:
     # 1. Configuración para tu PC (Desarrollo)
     DATABASES = {
