@@ -43,4 +43,7 @@ urlpatterns = [
     path('carrito/remover/<int:item_id>/', views.remover_del_carrito, name='remover_del_carrito'),
     path('carrito/limpiar/', views.limpiar_carrito, name='limpiar_carrito'),
     path('checkout/', views.procesar_compra, name='procesar_compra'),
+
+    # --- NUEVA RUTA PARA EL AGENTE INTELIGENTE (AZURE OPENAI) ---
+    path('chatbot/', views.responder_chatbot, name='chatbot'),
 ]

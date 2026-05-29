@@ -13,6 +13,10 @@ from .forms import ProductoForm, CategoriaForm, RegistroForm
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
+# --- IMPORTACIONES NUEVAS PARA EL AGENTE DE IA EN AZURE ---
+import os
+from openai import AzureOpenAI
+
 # Función auxiliar para verificar si el usuario es superusuario
 def es_superusuario(user):
     return user.is_superuser
@@ -69,6 +73,17 @@ def lista_productos(request):
     # Contexto adicional
     categorias = Categoria.objects.filter(activo=True)
     
+    # Productos aleatorios para el carrusel (solo para usuarios no admin)
+    productos_destacados = []
+    if not request.user.is_superuser:
+        # Obtener productos aleatorios con stock disponible
+        productos_disponibles = Producto.objects.filter(activo=True, stock__gt=0).select_related('categoria')
+        if productos_disponibles.count() >= 5:
+            import random
+            productos_destacados = random.sample(list(productos_disponibles), 5)
+        else:
+            productos_destacados = list(productos_disponibles)
+    
     context = {
         'productos': productos,
         'categorias': categorias,
@@ -78,7 +93,8 @@ def lista_productos(request):
         'precio_min': precio_min,
         'precio_max': precio_max,
         'orden_selected': orden,
-        'total_productos': productos_list.count() if hasattr(productos_list, 'count') else len(productos_list)
+        'total_productos': productos_list.count() if hasattr(productos_list, 'count') else len(productos_list),
+        'productos_destacados': productos_destacados,
     }
     
     return render(request, 'productos/lista.html', context)
@@ -174,9 +190,6 @@ def editar_categoria(request, pk):
 @login_required # <-- AÑADIDO: Proteger esta vista
 def mi_perfil(request):
     """Vista para mostrar y editar el perfil del usuario"""
-    # --- MODIFICADO ---
-    # Ya no se necesita el contexto falso. El objeto 'user'
-    # (request.user) está disponible automáticamente en la plantilla.
     return render(request, 'productos/usuario/perfil.html')
 
 @login_required # <-- AÑADIDO: Proteger esta vista
@@ -204,12 +217,6 @@ def configuracion(request):
     }
     return render(request, 'productos/usuario/configuracion.html', context)
 
-# --- ELIMINADO ---
-# La función 'cerrar_sesion' se elimina porque Django la manejará
-# automáticamente a través de la URL de 'logout'.
-
-
-# --- INICIO DE CÓDIGO NUEVO AÑADIDO ---
 
 def registrar_usuario(request):
     """Vista para registrar un nuevo usuario"""
@@ -227,10 +234,7 @@ def registrar_usuario(request):
     else:
         form = RegistroForm()
     
-    # Muestra la plantilla con el formulario (vacío o con errores)
     return render(request, 'productos/registrar.html', {'form': form})
-
-# --- FIN DE CÓDIGO NUEVO AÑADIDO ---
 
 
 # --- VISTAS DEL CARRITO DE COMPRAS ---
@@ -362,7 +366,7 @@ def limpiar_carrito(request):
         carrito.limpiar()
         messages.success(request, 'Carrito limpiado exitosamente')
     except Carrito.DoesNotExist:
-        messages.info(request, 'El carrito ya está vacío')
+        messages.remove(request, 'El carrito ya está vacío')
     
     return redirect('ver_carrito')
 
@@ -384,9 +388,6 @@ def procesar_compra(request):
                 return redirect('ver_carrito')
         
         if request.method == 'POST':
-            # Aquí procesarías el pago real
-            # Por ahora solo simularemos la compra
-            
             # Reducir stock
             for item in items:
                 producto = item.producto
@@ -409,3 +410,75 @@ def procesar_compra(request):
     except Carrito.DoesNotExist:
         messages.warning(request, 'Tu carrito está vacío')
         return redirect('lista_productos')
+
+
+# --- NUEVA VISTA PARA EL CHATBOT INTELIGENTE DE AZURE OPENAI ---
+@login_required
+def responder_chatbot(request):
+    """Vista asíncrona que gestiona la comunicación con el Agente de Azure OpenAI"""
+    if request.method == "POST":
+        mensaje_usuario = request.POST.get("mensaje", "")
+        
+        if not mensaje_usuario:
+            return JsonResponse({"success": False, "message": "El mensaje no puede estar vacío."})
+        
+        try:
+            # 1. Obtenemos el inventario dinámico de la base de datos relacional
+            inventario = Producto.objects.filter(activo=True).select_related('categoria')
+
+            # 2. Estructuramos el catálogo incluyendo el ID del producto para el mapeo de URLs
+            # 2. Estructuramos el catálogo incluyendo el ID del producto para el mapeo de URLs
+            lineas_catalogo = []
+            for prod in inventario:
+                # SOLUCIÓN: Verificamos si tiene categoría antes de sacar su nombre
+                nombre_categoria = prod.categoria.nombre if prod.categoria else "Sin categoría"
+                
+                lineas_catalogo.append(
+                    f"- ID: {prod.id} | {prod.nombre} | Categoría: {nombre_categoria} | Precio: ${prod.precio} | Stock: {prod.stock} unidades."
+                )
+            contexto_productos = "\n".join(lineas_catalogo)
+                        
+            # 3. Inicializamos el cliente oficial SDK de Azure OpenAI
+            client = AzureOpenAI(
+                azure_endpoint=config("AZURE_OPENAI_ENDPOINT"),
+                api_key=config("AZURE_OPENAI_KEY"),
+                api_version="2024-02-15-preview"
+            )
+            
+            # 4. Definimos el System Prompt del asistente 
+            system_prompt = (
+                "Eres 'TechBot', el asistente virtual inteligente del supermercado tecnológico TechStore Pro. "
+                "Tu objetivo es ayudar amablemente a los usuarios basándote ÚNICAMENTE en el inventario real provisto.\n\n"
+                "Lista oficial del inventario en tiempo real:\n"
+                f"{contexto_productos}\n\n"
+                "Directrices obligatorias:\n"
+                "1. Sé sumamente educado y servicial.\n"
+                "2. REGLA DE REDIRECCIÓN CRÍTICA: Cada vez que menciones un producto que SÍ está disponible en el catálogo, "
+                "debes incluir OBLIGATORIAMENTE su ID al lado de su nombre usando el formato estricto: [LINK:ID]. "
+                "Por ejemplo, si el producto 'Laptop HP' tiene ID 5, debes escribirlo exactamente como: Laptop HP [LINK:5]. "
+                "No inventes IDs, usa solo los provistos en la lista.\n"
+                "3. Si un producto de la lista tiene stock = 0, aclara que está agotado actualmente.\n"
+                "4. ¡No alucines ni inventes precios o características!"
+            )
+                        
+            # 5. Enviamos la petición al modelo 
+            response = client.chat.completions.create(
+                model=config("AZURE_OPENAI_DEPLOYMENT_NAME", default="gpt-4o-mini"),
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": mensaje_usuario}
+                ],
+                temperature=0.7
+            )
+            
+            # 6. Extraer los resultados
+            respuesta_ia = response.choices[0].message.content
+            return JsonResponse({"success": True, "respuesta": respuesta_ia})
+            
+        except Exception as e:
+            # --- AÑADE ESTA LÍNEA PARA VER EL ERROR EN LA TERMINAL ---
+            print(f"🔥🔥🔥 ERROR CRÍTICO DE AZURE: {str(e)}") 
+            
+            return JsonResponse({"success": False, "message": f"Error en el servicio de IA: {str(e)}"})
+            
+    return JsonResponse({"success": False, "message": "Método HTTP no válido."})

@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}TechStore Pro - Gestión de Inventario{% endblock %}</title>
+    <title>{% block title %}SuperMarket - Tu Supermercado ideal{% endblock %}</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
 
     <!-- Bootstrap 5.3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,15 +18,16 @@
 
     <style>
         :root {
-            --primary-color: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary-color: #64748b;
-            --success-color: #059669;
-            --warning-color: #d97706;
-            --danger-color: #dc2626;
-            --light-bg: #f8fafc;
-            --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --card-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --primary-color: #00a650;
+            --primary-dark: #008c44;
+            --secondary-color: #FFE600;
+            --accent-color: #ff6b00;
+            --success-color: #00a650;
+            --warning-color: #ff9800;
+            --danger-color: #e53935;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
         }
 
         * {
@@ -35,119 +36,190 @@
 
         body {
             background-color: var(--light-bg);
-            color: #1e293b;
+            color: #333;
             line-height: 1.6;
         }
 
+        /* Navbar estilo supermercado */
         .navbar-custom {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 1rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
         }
 
         .navbar-brand {
-            font-weight: 700;
-            font-size: 1.6rem;
+            font-weight: 800;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
             text-decoration: none !important;
             transition: all 0.3s ease;
             letter-spacing: -0.5px;
+            color: white !important;
         }
 
         .navbar-brand:hover {
-            transform: translateY(-1px);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transform: scale(1.05);
         }
 
         .navbar-brand i {
-            font-size: 1.4rem;
-            opacity: 0.9;
-            transition: all 0.3s ease;
-        }
-
-        .navbar-brand:hover i {
-            transform: rotate(5deg);
-            opacity: 1;
+            font-size: 1.6rem;
+            color: var(--secondary-color);
         }
 
         .nav-link {
-            font-weight: 500;
-            padding: 0.5rem 1rem !important;
+            font-weight: 600;
+            padding: 0.75rem 1.25rem !important;
             border-radius: 8px;
             transition: all 0.2s ease;
+            color: white !important;
+            font-size: 0.95rem;
         }
 
         .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-1px);
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
         }
 
+        .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        /* Carrito badge */
+        .cart-badge {
+            background: var(--accent-color) !important;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Main content */
         .main-content {
             min-height: calc(100vh - 200px);
             padding: 2rem 0;
         }
 
+        /* Cards estilo producto */
         .card {
-            border: none;
+            border: 1px solid #e0e0e0;
             border-radius: 12px;
             box-shadow: var(--card-shadow);
             transition: all 0.3s ease;
             background: white;
+            overflow: hidden;
         }
 
         .card:hover {
             box-shadow: var(--card-shadow-hover);
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
         }
 
         .card-header {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-bottom: 1px solid #e2e8f0;
+            background: white;
+            border-bottom: 2px solid var(--primary-color);
             border-radius: 12px 12px 0 0 !important;
-            padding: 1.5rem;
+            padding: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
         }
 
+        /* Botones estilo supermercado */
         .btn {
             border-radius: 8px;
-            font-weight: 500;
-            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
             transition: all 0.2s ease;
             border: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
         }
 
         .btn:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
         }
 
         .btn-success {
-            background: linear-gradient(135deg, var(--success-color) 0%, #047857 100%);
+            background: linear-gradient(135deg, var(--success-color) 0%, #007a3d 100%);
+            color: white;
         }
 
         .btn-warning {
-            background: linear-gradient(135deg, var(--warning-color) 0%, #b45309 100%);
+            background: linear-gradient(135deg, var(--accent-color) 0%, #e65100 100%);
+            color: white;
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, var(--danger-color) 0%, #b91c1c 100%);
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c62828 100%);
+            color: white;
         }
 
+        /* Precio destacado */
+        .precio-destacado {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Badge de descuento */
+        .badge-descuento {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        /* Alert messages */
         .alert {
             border: none;
             border-radius: 12px;
             padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
+            border-left: 4px solid;
         }
 
+        .alert-success {
+            background: #e8f5e9;
+            border-left-color: var(--success-color);
+            color: #2e7d32;
+        }
+
+        .alert-danger {
+            background: #ffebee;
+            border-left-color: var(--danger-color);
+            color: #c62828;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            border-left-color: var(--warning-color);
+            color: #e65100;
+        }
+
+        /* Form controls */
         .form-control,
         .form-select {
             border-radius: 8px;
-            border: 1px solid #d1d5db;
+            border: 2px solid #e0e0e0;
             padding: 0.75rem 1rem;
             transition: all 0.2s ease;
         }
@@ -155,80 +227,83 @@
         .form-control:focus,
         .form-select:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 166, 80, 0.1);
         }
 
+        /* Badge */
         .badge {
-            font-weight: 500;
+            font-weight: 600;
             padding: 0.5rem 0.75rem;
             border-radius: 6px;
+            font-size: 0.85rem;
         }
 
+        /* Page header estilo tienda */
         .page-header {
-            background: white;
+            background: linear-gradient(135deg, white 0%, #f8f9fa 100%);
             border-radius: 12px;
             padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary-color);
         }
 
+        .page-header h1 {
+            color: var(--primary-color);
+            font-weight: 800;
+        }
+
+        /* Stats cards */
         .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1rem;
+            border: none;
         }
 
+        /* Footer estilo supermercado */
         .footer {
-            background: #1e293b;
-            color: #94a3b8;
-            padding: 2rem 0;
-            margin-top: 3rem;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #b0b0b0;
+            padding: 3rem 0 1.5rem 0;
+            margin-top: 4rem;
         }
 
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, .3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+        .footer h6 {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 1rem;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .footer a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: color 0.2s;
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+        .footer a:hover {
+            color: var(--secondary-color);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        /* Product image */
         .product-image {
             width: 100%;
-            height: 200px;
+            height: 220px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 8px 8px 0 0;
+            transition: transform 0.3s ease;
         }
 
+        .card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        /* Status indicator */
         .status-indicator {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             display: inline-block;
             margin-right: 0.5rem;
@@ -246,6 +321,272 @@
             background-color: var(--danger-color);
         }
 
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Fade in animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Promotional banner */
+        .promo-banner {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #ff8f00 100%);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+        }
+
+        .promo-banner i {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Estilos del Chatbot */
+        .chatbot-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.6);
+        }
+
+        .chatbot-button.active {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #b91c1c 100%);
+        }
+
+        .chatbot-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 380px;
+            height: 500px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        .chatbot-window.show {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chatbot-header h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .chatbot-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chatbot-body {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .chatbot-message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .chatbot-message.bot {
+            justify-content: flex-start;
+        }
+
+        .chatbot-message.user {
+            justify-content: flex-end;
+        }
+
+        .chatbot-message-content {
+            max-width: 75%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .chatbot-message.bot .chatbot-message-content {
+            background: white;
+            color: #1e293b;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chatbot-message.user .chatbot-message-content {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chatbot-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .chatbot-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chatbot-input {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 24px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chatbot-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .chatbot-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .chatbot-send:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-welcome {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .chatbot-welcome i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .chatbot-welcome h5 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .chatbot-welcome p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-window {
+                width: calc(100vw - 40px);
+                right: 20px;
+                left: 20px;
+                height: 450px;
+            }
+
+            .chatbot-button {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
         @media (max-width: 768px) {
             .page-header {
                 padding: 1.5rem;
@@ -254,6 +595,121 @@
 
             .main-content {
                 padding: 1rem 0;
+            }
+        }
+
+        /* Estilos del Carrusel Grande */
+        .carousel-slide-wrapper {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+        }
+
+        .carousel-placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+        }
+
+        .carousel-caption-custom {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            text-align: left;
+            padding: 2rem 0;
+        }
+
+        .carousel-caption-custom h1 {
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            animation: slideInLeft 0.8s ease;
+        }
+
+        .carousel-caption-custom p {
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+            animation: slideInLeft 1s ease;
+        }
+
+        .carousel-caption-custom .btn {
+            animation: slideInLeft 1.2s ease;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 5%;
+            opacity: 0.8;
+        }
+
+        .carousel-control-prev:hover,
+        .carousel-control-next:hover {
+            opacity: 1;
+        }
+
+        .carousel-indicators {
+            margin-bottom: 1.5rem;
+        }
+
+        .carousel-indicators button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-slide-wrapper {
+                height: 400px;
+            }
+
+            .carousel-image {
+                height: 400px;
+            }
+
+            .carousel-caption-custom h1 {
+                font-size: 2rem;
+            }
+
+            .carousel-caption-custom p {
+                font-size: 1rem;
+            }
+
+            .carousel-overlay {
+                background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.3) 100%);
+            }
+
+            .carousel-caption-custom {
+                top: auto;
+                bottom: 0;
+                transform: none;
+                padding: 2rem 0;
             }
         }
     </style>
@@ -266,7 +722,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="{% url 'lista_productos' %}">
-                <i class="fas fa-store me-2"></i>TechStore Pro
+                <i class="fas fa-shopping-basket"></i>SuperMarket
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -277,19 +733,21 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'lista_productos' %}">
-                            <i class="fas fa-th-large me-2"></i>Dashboard
+                            <i class="fas fa-home me-1"></i>Inicio
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'lista_productos' %}">
-                            <i class="fas fa-box me-2"></i>Productos
+                            <i class="fas fa-box me-1"></i>Productos
                         </a>
                     </li>
+                    {% if user.is_superuser %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'lista_categorias' %}">
-                            <i class="fas fa-tags me-2"></i>Categorías
+                            <i class="fas fa-tags me-1"></i>Categorías
                         </a>
                     </li>
+                    {% endif %}
                 </ul>
 
                 <ul class="navbar-nav">
@@ -297,9 +755,9 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{% url 'ver_carrito' %}">
-                            <i class="fas fa-shopping-cart me-2"></i>Carrito
+                            <i class="fas fa-shopping-cart me-1"></i>Mi Carrito
                             {% if carrito_total_items > 0 %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge" style="font-size: 0.7em;">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge">
                                 {{ carrito_total_items }}
                             </span>
                             {% endif %}
@@ -308,42 +766,39 @@
                     {% if user.is_superuser %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'crear_producto' %}">
-                            <i class="fas fa-plus me-2"></i>Nuevo Producto
+                            <i class="fas fa-plus me-1"></i>Nuevo Producto
                         </a>
                     </li>
                     {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-2"></i>
+                            <i class="fas fa-user-circle me-1"></i>
                             {{ user.username }}
                             {% if user.is_superuser %}
                             <span class="badge bg-warning ms-1" style="font-size: 0.6em;">Admin</span>
                             {% endif %}
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'mi_perfil' %}"><i class="fas fa-user me-2"></i>Mi
-                                    Perfil</a></li>
-                            <li><a class="dropdown-item" href="{% url 'configuracion' %}"><i
-                                        class="fas fa-cog me-2"></i>Configuración</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i
-                                        class="fas fa-sign-out-alt me-2"></i>Cerrar
-                                    Sesión</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'mi_perfil' %}"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'configuracion' %}"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
                         </ul>
                     </li>
                     
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">
-                            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                            <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-warning text-dark ms-2" href="{% url 'registrar' %}">
+                            <i class="fas fa-user-plus me-1"></i>Registrarse
                         </a>
                     </li>
                     {% endif %}
 
-                </ul>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -374,16 +829,105 @@
     <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
-                    <h6><i class="fas fa-box me-2"></i>TechStore Pro</h6>
-                    <p class="mb-0">Sistema de gestión de inventario profesional</p>
+                <div class="col-md-4 mb-4">
+                    <h6><i class="fas fa-shopping-basket me-2"></i>SuperMarket</h6>
+                    <p class="mb-3">Tu supermercado de confianza, ahora en línea. Compra fácil, rápido y seguro.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp fa-lg"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0">© 2024 TechStore Pro. Todos los derechos reservados.</p>
+                <div class="col-md-2 mb-4">
+                    <h6>Compra</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'lista_productos' %}">Productos</a></li>
+                        <li><a href="{% url 'ver_carrito' %}">Mi Carrito</a></li>
+                        <li><a href="#">Ofertas</a></li>
+                        <li><a href="#">Novedades</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6>Ayuda</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Preguntas Frecuentes</a></li>
+                        <li><a href="#">Envíos</a></li>
+                        <li><a href="#">Devoluciones</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6>Cuenta</h6>
+                    <ul class="list-unstyled">
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'mi_perfil' %}">Mi Perfil</a></li>
+                        <li><a href="#">Mis Pedidos</a></li>
+                        <li><a href="{% url 'configuracion' %}">Configuración</a></li>
+                        {% else %}
+                        <li><a href="{% url 'login' %}">Iniciar Sesión</a></li>
+                        <li><a href="{% url 'registrar' %}">Registrarse</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6>Legal</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Términos y Condiciones</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr style="border-color: #444;">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">© 2024 SuperMarket Online. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">
+                        <i class="fas fa-lock me-1"></i>Compra 100% Segura
+                        <span class="mx-2">|</span>
+                        <i class="fas fa-truck me-1"></i>Envío Gratis desde $50
+                    </p>
                 </div>
             </div>
         </div>
     </footer>
+
+    <!-- Chatbot -->
+    {% if user.is_authenticated %}
+    <button class="chatbot-button" id="chatbotButton" onclick="toggleChatbot()">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-robot me-2"></i>
+                <h6>Asistente Virtual</h6>
+            </div>
+            <button class="chatbot-close" onclick="toggleChatbot()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chatbot-body" id="chatbotBody">
+            <div class="chatbot-welcome">
+                <i class="fas fa-robot"></i>
+                <h5>¡Hola, {{ user.username }}!</h5>
+                <p>Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?</p>
+            </div>
+        </div>
+        <div class="chatbot-footer">
+            <div class="chatbot-input-group">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Escribe tu mensaje...">
+                <button class="chatbot-send" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -421,3 +965,114 @@
                 }
             });
         })
+
+
+        // Chatbot functionality
+function toggleChatbot() {
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    const chatbotButton = document.getElementById('chatbotButton');
+    
+    if (chatbotWindow && chatbotButton) {
+        if (chatbotWindow.classList.contains('show')) {
+            chatbotWindow.classList.remove('show');
+            chatbotButton.classList.remove('active');
+        } else {
+            chatbotWindow.classList.add('show');
+            chatbotButton.classList.add('active');
+        }
+    }
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatbotInput');
+    const message = input.value.trim();
+    
+    if (message === '') return;
+    
+    // 1. Añadimos el mensaje del usuario en pantalla
+    addMessage(message, 'user');
+    input.value = '';
+    
+    // 2. Añadimos un indicador temporal de carga (bot escribiendo...)
+    addMessage('Escribiendo...', 'bot bot-loading');
+
+    // 3. Petición AJAX (Fetch) en tiempo real a tu backend de Django
+    fetch("/chatbot/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}" // Protección de Django
+        },
+        body: "mensaje=" + encodeURIComponent(message)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Quitamos el mensaje temporal de "Escribiendo..."
+        const loadingMsg = document.querySelector('.chatbot-message.bot-loading');
+        if (loadingMsg) loadingMsg.remove();
+
+        if (data.success) {
+            let respuestaBot = data.respuesta;
+
+            // TRUCO AVANZADO: Detecta [LINK:ID] y lo transforma en un botón de Django
+            respuestaBot = respuestaBot.replace(/\[LINK:(\d+)\]/g, function(match, id) {
+                return `<br><a href="/producto/${id}/" class="btn btn-sm btn-outline-primary mt-1 d-inline-block" style="font-size: 11px; padding: 2px 8px;">🔍 Ver Producto</a>`;
+            });
+
+            // 4. Agregamos la respuesta real procesada por Azure OpenAI
+            addMessage(respuestaBot, 'bot');
+        } else {
+            addMessage('Lo siento, en este momento tengo problemas para conectarme con mi base de conocimientos.', 'bot');
+        }
+    })
+    .catch(error => {
+        const loadingMsg = document.querySelector('.chatbot-message.bot-loading');
+        if (loadingMsg) loadingMsg.remove();
+        addMessage('Error de red. No se pudo establecer conexión con el servidor.', 'bot');
+    });
+}
+
+function addMessage(text, sender) {
+    const chatbotBody = document.getElementById('chatbotBody');
+    
+    // Remove welcome message if exists
+    const welcome = chatbotBody.querySelector('.chatbot-welcome');
+    if (welcome) {
+        welcome.remove();
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chatbot-message ${sender}`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'chatbot-message-content';
+    
+    // CORRECCIÓN CLAVE: Si el mensaje es del bot, permitimos HTML para que funcione el botón
+    if (sender.includes('user')) {
+        contentDiv.textContent = text;
+    } else {
+        contentDiv.innerHTML = text;
+    }
+    
+    messageDiv.appendChild(contentDiv);
+    chatbotBody.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+}
+
+// Allow Enter key to send message
+const chatbotInput = document.getElementById('chatbotInput');
+if (chatbotInput) {
+    chatbotInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+}
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

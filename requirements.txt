@@ -1,3 +1,12 @@
 Django==4.2.7
-#mysqlclient==2.2.0
 python-decouple==3.8
+
+# --- CONEXIÓN A BASE DE DATOS (AZURE POSTGRESQL) ---
+psycopg2-binary>=2.9.9
+
+# --- ALMACENAMIENTO CLOUD (AZURE BLOB STORAGE) ---
+django-storages[azure]>=1.14.4
+azure-storage-blob>=12.24.0
+
+# --- INTELIGENCIA ARTIFICIAL (AZURE OPENAI) ---
+openai>=1.55.0
