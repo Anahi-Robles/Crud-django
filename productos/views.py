@@ -639,14 +639,12 @@ def responder_chatbot(request):
                 )
             contexto_productos = "\n".join(lineas_catalogo)
                         
-            #  Inicializamos el cliente oficial SDK de Azure 
             client = AzureOpenAI(
                 azure_endpoint=config("AZURE_OPENAI_ENDPOINT"),
                 api_key=config("AZURE_OPENAI_KEY"),
                 api_version="2024-02-15-preview"
             )
             
-            # Definir el System Prompt del asistente mejorado
             system_prompt = (
                 "Eres 'TechBot', el asistente virtual inteligente del supermercado tecnológico TechStore Pro. "
                 "Tu objetivo es ayudar amablemente a los usuarios basándote ÚNICAMENTE en el inventario real provisto.\n\n"
