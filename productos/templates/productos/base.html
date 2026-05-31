@@ -469,6 +469,26 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
+        .chatbot-header-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 8px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .chatbot-header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .chatbot-body {
             flex: 1;
             padding: 1.5rem;
@@ -546,6 +566,32 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.2s;
+        }
+
+        .chatbot-send:hover {
+            transform: scale(1.1);
+        }
+
+        /* Estilos para botones de Agregar al Carrito desde el agente */
+        .btn-agregar-carrito-agente {
+            transition: all 0.3s ease;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-agregar-carrito-agente:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 166, 80, 0.3);
+        }
+
+        .btn-agregar-carrito-agente:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .chatbot-message.bot-loading .chatbot-message-content {
+            font-style: italic;
+            color: #999;
         }
 
         .chatbot-send:hover {
@@ -895,7 +941,7 @@
         </div>
     </footer>
 
-    <!-- Chatbot -->
+    
     {% if user.is_authenticated %}
     <button class="chatbot-button" id="chatbotButton" onclick="toggleChatbot()">
         <i class="fas fa-comments"></i>
@@ -903,13 +949,20 @@
 
     <div class="chatbot-window" id="chatbotWindow">
         <div class="chatbot-header">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-robot me-2"></i>
-                <h6>Asistente Virtual</h6>
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-robot me-2"></i>
+                    <h6>Asistente Virtual</h6>
+                </div>
+                <div>
+                    <button class="chatbot-header-btn" title="Limpiar chat" onclick="limpiarChatVisual()" style="margin-right: 8px;">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button class="chatbot-close" onclick="toggleChatbot()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
-            <button class="chatbot-close" onclick="toggleChatbot()">
-                <i class="fas fa-times"></i>
-            </button>
         </div>
         <div class="chatbot-body" id="chatbotBody">
             <div class="chatbot-welcome">
@@ -942,6 +995,15 @@
                     bsAlert.close();
                 }, 5000);
             });
+            
+            // NUEVO: Agregar listener a todos los links de logout
+            const logoutLinks = document.querySelectorAll('a[href*="logout"]');
+            logoutLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Limpiar historial del chat antes de logout
+                    limpiarHistorialDelChat();
+                });
+            });
         });
 
         // Loading states for buttons
@@ -967,7 +1029,7 @@
         })
 
 
-        // Chatbot functionality
+        // Chatbot
 function toggleChatbot() {
     const chatbotWindow = document.getElementById('chatbotWindow');
     const chatbotButton = document.getElementById('chatbotButton');
@@ -979,6 +1041,14 @@ function toggleChatbot() {
         } else {
             chatbotWindow.classList.add('show');
             chatbotButton.classList.add('active');
+            
+            // Cargar historial cuando se abre el chat
+            setTimeout(() => {
+                cargarHistorialDelChat();
+                // Enfocar el input
+                const input = document.getElementById('chatbotInput');
+                if (input) input.focus();
+            }, 100);
         }
     }
 }
@@ -989,14 +1059,22 @@ function sendMessage() {
     
     if (message === '') return;
     
-    // 1. Añadimos el mensaje del usuario en pantalla
+    // Añadir el mensaje del usuario en pantalla
     addMessage(message, 'user');
     input.value = '';
     
-    // 2. Añadimos un indicador temporal de carga (bot escribiendo...)
-    addMessage('Escribiendo...', 'bot bot-loading');
+    // Añadir un indicador temporal de carga 
+    const chatbotBody = document.getElementById('chatbotBody');
+    const loadingMsg = document.createElement('div');
+    loadingMsg.className = 'chatbot-message bot bot-loading';
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'chatbot-message-content';
+    contentDiv.textContent = 'Escribiendo...';
+    loadingMsg.appendChild(contentDiv);
+    chatbotBody.appendChild(loadingMsg);
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
 
-    // 3. Petición AJAX (Fetch) en tiempo real a tu backend de Django
+    // Petición AJAX (Fetch) en tiempo real 
     fetch("/chatbot/", {
         method: "POST",
         headers: {
@@ -1007,20 +1085,28 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        // Quitamos el mensaje temporal de "Escribiendo..."
+        // Quitar el mensaje temporal de "Escribiendo..."
         const loadingMsg = document.querySelector('.chatbot-message.bot-loading');
         if (loadingMsg) loadingMsg.remove();
 
         if (data.success) {
             let respuestaBot = data.respuesta;
 
-            // TRUCO AVANZADO: Detecta [LINK:ID] y lo transforma en un botón de Django
+            //  Detecta [LINK:ID] y lo transforma en un botón
             respuestaBot = respuestaBot.replace(/\[LINK:(\d+)\]/g, function(match, id) {
                 return `<br><a href="/producto/${id}/" class="btn btn-sm btn-outline-primary mt-1 d-inline-block" style="font-size: 11px; padding: 2px 8px;">🔍 Ver Producto</a>`;
             });
 
-            // 4. Agregamos la respuesta real procesada por Azure OpenAI
+            // Detecta [AGREGAR_AL_CARRITO:ID:CANTIDAD] y lo transforma en un botón con acción
+            respuestaBot = respuestaBot.replace(/\[AGREGAR_AL_CARRITO:(\d+):(\d+)\]/g, function(match, productoId, cantidad) {
+                return `<br><button class="btn btn-sm btn-success mt-1 btn-agregar-carrito-agente d-inline-block" data-producto-id="${productoId}" data-cantidad="${cantidad}" style="font-size: 11px; padding: 2px 8px;">✓ Agregar al Carrito</button>`;
+            });
+
+            // Agregar la respuesta real procesada por Azure 
             addMessage(respuestaBot, 'bot');
+
+            // Agregar event listeners a los botones recién creados
+            attachAddToCartListeners();
         } else {
             addMessage('Lo siento, en este momento tengo problemas para conectarme con mi base de conocimientos.', 'bot');
         }
@@ -1028,14 +1114,336 @@ function sendMessage() {
     .catch(error => {
         const loadingMsg = document.querySelector('.chatbot-message.bot-loading');
         if (loadingMsg) loadingMsg.remove();
+        console.error('Error:', error);
         addMessage('Error de red. No se pudo establecer conexión con el servidor.', 'bot');
     });
 }
 
+// Función para manejar clicks en botones "Agregar al Carrito"
+function attachAddToCartListeners() {
+    // Usar event delegation para capturar clics en botones dinámicos
+    const chatbotBody = document.getElementById('chatbotBody');
+    
+    // Remover listeners antiguos
+    chatbotBody.removeEventListener('click', handleCartButtonClick);
+    
+    // Agregar nuevo listener con delegación
+    chatbotBody.addEventListener('click', handleCartButtonClick);
+    
+    function handleCartButtonClick(e) {
+        // Botón de agregar
+        if (e.target.classList.contains('btn-agregar-carrito-agente') || 
+            e.target.closest('.btn-agregar-carrito-agente')) {
+            e.preventDefault();
+            
+            const boton = e.target.classList.contains('btn-agregar-carrito-agente') 
+                ? e.target 
+                : e.target.closest('.btn-agregar-carrito-agente');
+            
+            const productoId = boton.getAttribute('data-producto-id');
+            const cantidad = boton.getAttribute('data-cantidad');
+            
+            if (productoId && cantidad) {
+                agregarAlCarritoDesdeAgente(productoId, cantidad, boton);
+            }
+        }
+        
+        // Botón de eliminar
+        if (e.target.classList.contains('btn-eliminar-carrito-agente') || 
+            e.target.closest('.btn-eliminar-carrito-agente')) {
+            e.preventDefault();
+            
+            const boton = e.target.classList.contains('btn-eliminar-carrito-agente') 
+                ? e.target 
+                : e.target.closest('.btn-eliminar-carrito-agente');
+            
+            const productoId = boton.getAttribute('data-producto-id');
+            
+            if (productoId) {
+                eliminarDelCarritoDesdeAgente(productoId, boton);
+            }
+        }
+        
+        // Botón de actualizar cantidad
+        if (e.target.classList.contains('btn-actualizar-cantidad-agente') || 
+            e.target.closest('.btn-actualizar-cantidad-agente')) {
+            e.preventDefault();
+            
+            const boton = e.target.classList.contains('btn-actualizar-cantidad-agente') 
+                ? e.target 
+                : e.target.closest('.btn-actualizar-cantidad-agente');
+            
+            const productoId = boton.getAttribute('data-producto-id');
+            const cantidad = boton.getAttribute('data-cantidad');
+            
+            if (productoId && cantidad) {
+                actualizarCantidadDesdeAgente(productoId, cantidad, boton);
+            }
+        }
+    }
+}
+
+// Función para agregar al carrito mediante el endpoint del agente
+function agregarAlCarritoDesdeAgente(productoId, cantidad, boton) {
+    if (!productoId || !cantidad || !boton) {
+        console.error('Parámetros inválidos');
+        return;
+    }
+    
+    // Evitar clicks duplicados
+    if (boton.dataset.procesando === 'true') {
+        return;
+    }
+    
+    boton.dataset.procesando = 'true';
+    const textoOriginal = boton.innerHTML;
+    boton.disabled = true;
+    boton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Agregando...';
+    
+    fetch("/carrito/agregar-agente/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            producto_id: parseInt(productoId),
+            cantidad: parseInt(cantidad)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensaje de éxito
+            boton.classList.remove('btn-success');
+            boton.classList.add('btn-secondary');
+            boton.innerHTML = '✓ Agregado al carrito';
+            
+            // Mostrar confirmación en el chat (UNA SOLA VEZ)
+            addMessage(`✓ ${data.message}`, 'bot');
+            
+            // Actualizar contador del carrito si es posible
+            updateCartCount(data.total_items);
+            
+            // Restaurar botón después de 2 segundos
+            setTimeout(() => {
+                boton.innerHTML = textoOriginal;
+                boton.classList.remove('btn-secondary');
+                boton.classList.add('btn-success');
+                boton.disabled = false;
+                boton.dataset.procesando = 'false';
+            }, 2000);
+        } else {
+            // Error
+            boton.classList.add('btn-danger');
+            boton.innerHTML = '✗ Error';
+            const errorMsg = data.message || 'No se pudo agregar el producto';
+            addMessage('❌ ' + errorMsg, 'bot');
+            
+            setTimeout(() => {
+                boton.innerHTML = textoOriginal;
+                boton.classList.remove('btn-danger');
+                boton.classList.add('btn-success');
+                boton.disabled = false;
+                boton.dataset.procesando = 'false';
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        boton.classList.add('btn-danger');
+        boton.innerHTML = '✗ Error';
+        addMessage('❌ Error de conexión al intentar agregar al carrito', 'bot');
+        
+        setTimeout(() => {
+            boton.innerHTML = textoOriginal;
+            boton.classList.remove('btn-danger');
+            boton.classList.add('btn-success');
+            boton.disabled = false;
+            boton.dataset.procesando = 'false';
+        }, 3000);
+    });
+}
+
+// Función para actualizar el contador del carrito
+function updateCartCount(totalItems) {
+    const cartBadge = document.querySelector('.cart-badge');
+    if (cartBadge) {
+        cartBadge.textContent = totalItems;
+    }
+}
+
+// Función para eliminar del carrito mediante el endpoint del agente
+function eliminarDelCarritoDesdeAgente(productoId, boton) {
+    if (!productoId || !boton) {
+        console.error('Parámetros inválidos');
+        return;
+    }
+    
+    // Evitar clicks duplicados
+    if (boton.dataset.procesando === 'true') {
+        return;
+    }
+    
+    boton.dataset.procesando = 'true';
+    const textoOriginal = boton.innerHTML;
+    boton.disabled = true;
+    boton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Eliminando...';
+    
+    fetch("/carrito/remover-agente/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            producto_id: parseInt(productoId)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensaje de éxito
+            boton.classList.remove('btn-danger');
+            boton.classList.add('btn-secondary');
+            boton.innerHTML = '✓ Eliminado';
+            
+            // Mostrar confirmación en el chat (UNA SOLA VEZ)
+            addMessage(`✓ ${data.message}`, 'bot');
+            
+            // Actualizar contador del carrito
+            updateCartCount(data.total_items);
+            
+            // Restaurar botón después de 2 segundos
+            setTimeout(() => {
+                boton.innerHTML = textoOriginal;
+                boton.classList.remove('btn-secondary');
+                boton.classList.add('btn-danger');
+                boton.disabled = false;
+                boton.dataset.procesando = 'false';
+            }, 2000);
+        } else {
+            // Error
+            boton.classList.add('btn-dark');
+            boton.innerHTML = '✗ Error';
+            addMessage('❌ ' + data.message, 'bot');
+            
+            setTimeout(() => {
+                boton.innerHTML = textoOriginal;
+                boton.classList.remove('btn-dark');
+                boton.classList.add('btn-danger');
+                boton.disabled = false;
+                boton.dataset.procesando = 'false';
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        boton.classList.add('btn-dark');
+        boton.innerHTML = '✗ Error';
+        addMessage('❌ Error de conexión al eliminar del carrito', 'bot');
+        
+        setTimeout(() => {
+            boton.innerHTML = textoOriginal;
+            boton.classList.remove('btn-dark');
+            boton.classList.add('btn-danger');
+            boton.disabled = false;
+            boton.dataset.procesando = 'false';
+        }, 3000);
+    });
+}
+
+// Función para actualizar cantidad desde el agente
+function actualizarCantidadDesdeAgente(productoId, cantidad, boton) {
+    if (!productoId || !cantidad || !boton) {
+        console.error('Parámetros inválidos');
+        return;
+    }
+    
+    // Evitar clicks duplicados
+    if (boton.dataset.procesando === 'true') {
+        return;
+    }
+    
+    boton.dataset.procesando = 'true';
+    const textoOriginal = boton.innerHTML;
+    boton.disabled = true;
+    boton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Actualizando...';
+    
+    fetch("/carrito/actualizar-cantidad-agente/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            producto_id: parseInt(productoId),
+            cantidad: parseInt(cantidad)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensaje de éxito
+            boton.classList.remove('btn-warning');
+            boton.classList.add('btn-secondary');
+            boton.innerHTML = '✓ Actualizado';
+            
+            // Mostrar confirmación en el chat (UNA SOLA VEZ)
+            addMessage(`✓ ${data.message}`, 'bot');
+            
+            // Actualizar contador del carrito
+            updateCartCount(data.total_items);
+            
+            // Restaurar botón después de 2 segundos
+            setTimeout(() => {
+                boton.innerHTML = textoOriginal;
+                boton.classList.remove('btn-secondary');
+                boton.classList.add('btn-warning');
+                boton.disabled = false;
+                boton.dataset.procesando = 'false';
+            }, 2000);
+        } else {
+            // Error
+            boton.classList.add('btn-dark');
+            boton.innerHTML = '✗ Error';
+            addMessage('❌ ' + data.message, 'bot');
+            
+            setTimeout(() => {
+                boton.innerHTML = textoOriginal;
+                boton.classList.remove('btn-dark');
+                boton.classList.add('btn-warning');
+                boton.disabled = false;
+                boton.dataset.procesando = 'false';
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        boton.classList.add('btn-dark');
+        boton.innerHTML = '✗ Error';
+        addMessage('❌ Error de conexión al actualizar cantidad', 'bot');
+        
+        setTimeout(() => {
+            boton.innerHTML = textoOriginal;
+            boton.classList.remove('btn-dark');
+            boton.classList.add('btn-warning');
+            boton.disabled = false;
+            boton.dataset.procesando = 'false';
+        }, 3000);
+    });
+}
+
+// ==================== SISTEMA DE HISTORIAL DE CHAT ====================
+// Guardar mensajes en sessionStorage para mantener historial entre secciones
+
+
+// ========================================================================
+
 function addMessage(text, sender) {
     const chatbotBody = document.getElementById('chatbotBody');
     
-    // Remove welcome message if exists
+    
     const welcome = chatbotBody.querySelector('.chatbot-welcome');
     if (welcome) {
         welcome.remove();
@@ -1047,7 +1455,6 @@ function addMessage(text, sender) {
     const contentDiv = document.createElement('div');
     contentDiv.className = 'chatbot-message-content';
     
-    // CORRECCIÓN CLAVE: Si el mensaje es del bot, permitimos HTML para que funcione el botón
     if (sender.includes('user')) {
         contentDiv.textContent = text;
     } else {
@@ -1057,11 +1464,87 @@ function addMessage(text, sender) {
     messageDiv.appendChild(contentDiv);
     chatbotBody.appendChild(messageDiv);
     
-    // Scroll to bottom
+    // Guardar mensaje en el historial de sessionStorage
+    guardarMensajeEnHistorial(text, sender);
+    
+    // Hacer scroll al último mensaje
     chatbotBody.scrollTop = chatbotBody.scrollHeight;
 }
 
-// Allow Enter key to send message
+// ==================== FUNCIONES DE HISTORIAL ====================
+
+// Guardar un mensaje en sessionStorage
+function guardarMensajeEnHistorial(text, sender) {
+    let historial = JSON.parse(sessionStorage.getItem('chatbot_historial') || '[]');
+    historial.push({
+        text: text,
+        sender: sender,
+        timestamp: new Date().toISOString()
+    });
+    sessionStorage.setItem('chatbot_historial', JSON.stringify(historial));
+}
+
+// Cargar historial cuando se abre el chat
+function cargarHistorialDelChat() {
+    const chatbotBody = document.getElementById('chatbotBody');
+    let historial = JSON.parse(sessionStorage.getItem('chatbot_historial') || '[]');
+    
+    if (historial.length > 0) {
+        // Limpiar el chat
+        chatbotBody.innerHTML = '';
+        
+        // Mostrar todos los mensajes guardados
+        historial.forEach(msg => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chatbot-message ${msg.sender}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'chatbot-message-content';
+            
+            if (msg.sender.includes('user')) {
+                contentDiv.textContent = msg.text;
+            } else {
+                contentDiv.innerHTML = msg.text;
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            chatbotBody.appendChild(messageDiv);
+        });
+        
+        // Volver a adjuntar event listeners a botones
+        attachAddToCartListeners();
+    }
+    
+    // Hacer scroll al final
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+}
+
+// Limpiar historial visualmente (botón de basura)
+function limpiarChatVisual() {
+    const chatbotBody = document.getElementById('chatbotBody');
+    chatbotBody.innerHTML = '';
+    
+    // Mostrar mensaje de bienvenida nuevamente
+    const welcome = document.createElement('div');
+    welcome.className = 'chatbot-welcome';
+    welcome.innerHTML = `
+        <i class="fas fa-robot"></i>
+        <h5>¡Hola, {{ user.username }}!</h5>
+        <p>Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?</p>
+    `;
+    chatbotBody.appendChild(welcome);
+    
+    // Limpiar del sessionStorage también
+    sessionStorage.setItem('chatbot_historial', '[]');
+}
+
+// Limpiar historial completamente (logout)
+function limpiarHistorialDelChat() {
+    sessionStorage.setItem('chatbot_historial', '[]');
+}
+
+// ================================================================
+
 const chatbotInput = document.getElementById('chatbotInput');
 if (chatbotInput) {
     chatbotInput.addEventListener('keypress', function(e) {

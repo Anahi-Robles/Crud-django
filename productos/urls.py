@@ -39,6 +39,9 @@ urlpatterns = [
     # Carrito de Compras
     path('carrito/', views.ver_carrito, name='ver_carrito'),
     path('carrito/agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
+    path('carrito/agregar-agente/', views.agregar_al_carrito_agente, name='agregar_al_carrito_agente'),
+    path('carrito/remover-agente/', views.remover_del_carrito_agente, name='remover_del_carrito_agente'),
+    path('carrito/actualizar-cantidad-agente/', views.actualizar_cantidad_carrito_agente, name='actualizar_cantidad_carrito_agente'),
     path('carrito/actualizar/<int:item_id>/', views.actualizar_carrito, name='actualizar_carrito'),
     path('carrito/remover/<int:item_id>/', views.remover_del_carrito, name='remover_del_carrito'),
     path('carrito/limpiar/', views.limpiar_carrito, name='limpiar_carrito'),
